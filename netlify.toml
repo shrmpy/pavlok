@@ -1,0 +1,40 @@
+
+[template]
+[template.environment]
+  AMBER_PHRASE = "secret phrase used to encrypt OAuth state field"
+  DISCORD_WEBHOOK = ""
+  EXTENSION_SECRET = "secret from the Twitch Extension Manager"
+  FAUNADB_SECRET = "secret from Fauna DB account"
+  GITHUB_AVATAR = ""
+  PAVLOK_CLIENT_ID = "Pavlok app client ID"
+  PAVLOK_CLIENT_SECRET ="Pavlok app secret"
+  PAVLOK_REDIRECT_URI = "Pavlok redirect (URL after Netlify deployment completes)"
+
+
+[build]
+  command = "make build"
+  functions = "functions"
+  publish = "public"
+
+[build.environment]
+  GO_IMPORT_PATH = "github.com/shrmpy/pavlok"
+  GO111MODULE = "on"
+
+[[redirects]]
+  from = "/api/pavlok/auth"
+  to = "/.netlify/functions/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/pavlok/callback"
+  to = "/.netlify/functions/callback/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/pavlok/shock"
+  to = "/.netlify/functions/shock/:splat"
+  status = 200
+  force = true
+
