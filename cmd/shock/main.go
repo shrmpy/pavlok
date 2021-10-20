@@ -11,8 +11,8 @@ import (
 var helper *service
 
 func init() {
-        secret := os.Getenv("EXTENSION_SECRET")
-        helper = newService(decodeSecret(secret))
+	secret := os.Getenv("EXTENSION_SECRET")
+	helper = newService(decodeSecret(secret))
 }
 
 //  *API* flow
@@ -26,10 +26,10 @@ func main() {
 }
 
 func handler(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-        r, err := preprocess(ev)
-        if err != nil {
-                return r, nil
-        }
+	r, err := preprocess(ev)
+	if err != nil {
+		return r, nil
+	}
 
 	refid := broadcaster(ev)
 	if refid == "" {
@@ -41,8 +41,8 @@ func handler(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	payload := notify(status)
 	webhook(status)
 
-        hdr := enableCors()
-        hdr["Content-Type"] = "application/json"
+	hdr := enableCors()
+	hdr["Content-Type"] = "application/json"
 	return events.APIGatewayProxyResponse{
 		StatusCode:      200,
 		Body:            string(payload),
@@ -50,7 +50,6 @@ func handler(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 		IsBase64Encoded: false,
 	}, nil
 }
-
 
 func query(refid string) string {
 	log.Printf("Query by broadcaster - %s", refid)
@@ -61,4 +60,3 @@ func query(refid string) string {
 
 	return token
 }
-

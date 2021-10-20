@@ -1,23 +1,18 @@
-
 package main
 
 import (
-	"errors"
 	"encoding/base64"
+	"errors"
 
 	"log"
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
-
 )
 
 const (
-
-
 	authHeaderName      string = "Authorization"
 	authHeaderPrefix    string = "Bearer "
 	authHeaderPrefixLen int    = len(authHeaderPrefix)
@@ -27,10 +22,10 @@ const (
 type contextKeyType string
 
 type service struct {
-	parser    jwt.Parser
-	secret    []byte
-	nextPongs map[string]time.Time
-	mutex     sync.Mutex
+	parser jwt.Parser
+	secret []byte
+
+	mutex sync.Mutex
 }
 
 func decodeSecret(encodedSecret string) []byte {
@@ -51,12 +46,10 @@ func decodeSecret(encodedSecret string) []byte {
 // newService creates an instance of our service data that stores the secret and JWT parser
 func newService(secret []byte) *service {
 	return &service{
-		parser:    jwt.Parser{ValidMethods: []string{"HS256"}},
-		secret:    secret,
-		nextPongs: make(map[string]time.Time),
+		parser: jwt.Parser{ValidMethods: []string{"HS256"}},
+		secret: secret,
 	}
 }
-
 
 func (s *service) getKey(*jwt.Token) (interface{}, error) {
 	return s.secret, nil
@@ -105,4 +98,3 @@ func (s *service) token(r *http.Request) (string, error) {
 	token = token[authHeaderPrefixLen:]
 	return token, nil
 }
-

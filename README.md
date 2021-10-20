@@ -9,13 +9,14 @@ EBS as serverless function via &#x1F327; (firebase, cloudflare, netlify, or ?)
 
 
 ### Requirements
-
 - Netlify account
 - Fauna DB account
 - Pavlok app registration
 - Twitch extension registration
 - Discord webhook (OPTIONAL)
 
+### Quickstart
+The companion blog series is on [dev.to](https://dev.to/shrmpy/series/14971)
 
 
 ### Credits

@@ -11,21 +11,21 @@ import (
 
 // struct for key value pairs
 type Pairs struct {
-	sdk     *f.FaunaClient
-	db      string
-	table   string
-	index   string
+	sdk   *f.FaunaClient
+	db    string
+	table string
+	index string
 }
 
 // record fields (table row)
 type Broadcast struct {
 	Universal string `fauna:"universal"`
-	Name string `fauna:"name"`
+	Name      string `fauna:"name"`
 }
 
 var (
 	dataField = f.ObjKey("data")
-	keyField = f.ObjKey("ref")
+	keyField  = f.ObjKey("ref")
 )
 
 func NewPairs(secret string, db string) *Pairs {
@@ -56,22 +56,22 @@ func (p *Pairs) Update(token string, channel string) {
 	// (approximate update behavior)
 	p.deleteRecord(channel)
 
-        // Populate new record
-        row := Broadcast{Name: token, Universal: channel}
+	// Populate new record
+	row := Broadcast{Name: token, Universal: channel}
 
-        // Adding record as new table row
-        _, err := p.sdk.Query(
-                f.Create(
-                        f.Collection(p.table),
-                        f.Obj{"data": row},
-                ))
+	// Adding record as new table row
+	_, err := p.sdk.Query(
+		f.Create(
+			f.Collection(p.table),
+			f.Obj{"data": row},
+		))
 
-        if err != nil {
-                log.Printf("Insert %s table failed - %v", p.table, err)
-        }
+	if err != nil {
+		log.Printf("Insert %s table failed - %v", p.table, err)
+	}
 }
 
-func (p *Pairs) deleteRecord(id string)  {
+func (p *Pairs) deleteRecord(id string) {
 	log.Printf("Delete by channel-id - %s", id)
 	val, err := p.queryRecord(id)
 	if err != nil {
@@ -95,11 +95,10 @@ func (p *Pairs) queryRecord(id string) (val f.Value, err error) {
 	if err != nil {
 		log.Printf("Query by failed - %s ", id)
 		log.Print(err)
-		return 
+		return
 	}
 
 	log.Printf("Datarow matched - %s", id)
 	log.Print(val)
-	return 
+	return
 }
-

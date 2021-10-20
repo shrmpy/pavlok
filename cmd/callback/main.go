@@ -11,8 +11,8 @@ import (
 var helper *service
 
 func init() {
-        secret := os.Getenv("EXTENSION_SECRET")
-        helper = newService(decodeSecret(secret))
+	secret := os.Getenv("EXTENSION_SECRET")
+	helper = newService(decodeSecret(secret))
 }
 
 func main() {
@@ -35,8 +35,6 @@ func handler(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	}, nil
 }
 
-
-
 // JS that closes the pop-up because the
 // auth provider (pavlok) sent the browser
 // here after completing auth via the redirect_uri
@@ -53,4 +51,3 @@ func formatJs() string {
 
 	return js.String()
 }
-

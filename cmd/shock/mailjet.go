@@ -35,26 +35,26 @@ func notify(status string) string {
 		body = "shock API status - " + status
 	}
 
-	messagesInfo := []mailjet.InfoMessagesV31 {
+	messagesInfo := []mailjet.InfoMessagesV31{
 		mailjet.InfoMessagesV31{
 			From: &mailjet.RecipientV31{
 				Email: mjfrom,
-				Name: "TWITCH-EXT-DEMO",
+				Name:  "TWITCH-EXT-DEMO",
 			},
 			To: &mailjet.RecipientsV31{
-				mailjet.RecipientV31 {
+				mailjet.RecipientV31{
 					Email: alertto,
-					Name: alertto,
+					Name:  alertto,
 				},
 			},
-			Subject: "twitch extension demo alert test.",
+			Subject:  "twitch extension demo alert test.",
 			TextPart: body,
 			HTMLPart: "<div>**test**</div>" + body,
 			CustomID: "TwitchExtDemoTest",
 		},
 	}
 
-	messages := mailjet.MessagesV31{Info: messagesInfo }
+	messages := mailjet.MessagesV31{Info: messagesInfo}
 	res, err := mj.SendMailV31(&messages)
 	if err != nil {
 		log.Print("Mail failed")
@@ -65,4 +65,3 @@ func notify(status string) string {
 	log.Print(res)
 	return status
 }
-

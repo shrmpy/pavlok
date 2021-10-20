@@ -1,6 +1,6 @@
 /*
 
-*/
+ */
 package main
 
 import (
@@ -17,7 +17,7 @@ import (
 
 // convenience to use a known token as the state value
 func encryptState(plain string) string {
-	// encrypt plain value 
+	// encrypt plain value
 	phrase := os.Getenv("AMBER_PHRASE")
 	buf := encrypt([]byte(plain), phrase)
 	return hex.EncodeToString(buf)
@@ -71,5 +71,3 @@ func decrypt(data []byte, passphrase string) []byte {
 	}
 	return plaintext
 }
-
-

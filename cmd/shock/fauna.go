@@ -11,16 +11,16 @@ import (
 
 // struct for key value pairs
 type Pairs struct {
-	sdk     *f.FaunaClient
-	db      string
-	table   string
-	index   string
+	sdk   *f.FaunaClient
+	db    string
+	table string
+	index string
 }
 
 // record fields (table row)
 type Broadcast struct {
 	Universal string `fauna:"universal"`
-	Name string `fauna:"name"`
+	Name      string `fauna:"name"`
 }
 
 var (

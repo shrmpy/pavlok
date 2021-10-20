@@ -6,11 +6,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
 )
 
-
-// call pavlok API 
+// call pavlok API
 func callAPI(token string) string {
 	log.Printf("API access - %s", token)
 
@@ -45,5 +43,3 @@ func callAPI(token string) string {
 
 	return string(data)
 }
-
-

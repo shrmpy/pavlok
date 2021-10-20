@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"net/url"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -34,20 +34,15 @@ func handler(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	}
 
 	state := generateState(ev)
-	/*
-	err = reserveBroadcaster(ev)
-	if err != nil {
-		return newResponse(err.Error(), 500), nil
-	}*/
 
 	hdr := enableCors()
 	hdr["Content-Type"] = "application/json"
 	buf, _ := json.Marshal(redirectHeaders(state))
 
 	return events.APIGatewayProxyResponse{
-		StatusCode:      200,
-		Headers:         hdr,
-		Body:            string(buf),
+		StatusCode: 200,
+		Headers:    hdr,
+		Body:       string(buf),
 	}, nil
 }
 
@@ -69,5 +64,3 @@ func redirectHeaders(state string) map[string]string {
 	m["Location"] = base + params.Encode()
 	return m
 }
-
-
