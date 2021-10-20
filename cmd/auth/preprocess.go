@@ -1,12 +1,12 @@
 /*
 
-*/
+ */
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
-	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,54 +16,47 @@ import (
 )
 
 func preprocess(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-        if ev.HTTPMethod == "OPTIONS" {
-                // answer preflight checks
-                return newResponse("", http.StatusOK), errors.New("preflight step")
-        }
+	if ev.HTTPMethod == "OPTIONS" {
+		// answer preflight checks
+		return newResponse("", http.StatusOK), errors.New("preflight step")
+	}
 
-        accessor := core.RequestAccessor{}
-        req, err := accessor.EventToRequest(ev)
-        if err != nil {
+	accessor := core.RequestAccessor{}
+	req, err := accessor.EventToRequest(ev)
+	if err != nil {
 		log.Print("Convert event failed response ")
-                return newResponse(err.Error(), http.StatusInternalServerError), err
-        }
+		return newResponse(err.Error(), http.StatusInternalServerError), err
+	}
 
 	token, err := helper.token(req)
 	if err != nil {
 		log.Print("JWT extract failed ")
-                return newResponse(token, http.StatusUnauthorized), errors.New("jwt extract")
+		return newResponse(token, http.StatusUnauthorized), errors.New("jwt extract")
 	}
-	/*
-        descr := helper.verifyJWT(token)
-        if descr != "" {
-		log.Print("JWT validate failed response ")
-                return newResponse(descr, http.StatusUnauthorized), errors.New("jwt step")
-        }*/
 
 	return events.APIGatewayProxyResponse{}, nil
 }
 
 // make state value that functions like a file hash
 func generateState(ev events.APIGatewayProxyRequest) string {
-        accessor := core.RequestAccessor{}
-        req, err := accessor.EventToRequest(ev)
-        if err != nil {
+	accessor := core.RequestAccessor{}
+	req, err := accessor.EventToRequest(ev)
+	if err != nil {
 		log.Print("Convert event failed, state not created")
-                return ""
-        }
+		return ""
+	}
 
 	token, err := helper.token(req)
 	if err != nil {
 		log.Print("JWT extract failed ")
-                return ""
+		return ""
 	}
-	log.Print("Making envelope for token...." )
+	log.Print("Making envelope for token....")
 	// wrap token for use as state value
 	ciphertext := encryptState(token)
 	log.Printf("Serialized to - %s", ciphertext)
 	return ciphertext
 }
-
 
 // include CORS in response header
 func newResponse(descr string, status int) events.APIGatewayProxyResponse {
@@ -72,8 +65,8 @@ func newResponse(descr string, status int) events.APIGatewayProxyResponse {
 	hdr["Content-Type"] = "application/json"
 
 	return events.APIGatewayProxyResponse{
-		Body: string(buf),
-		Headers: hdr,
+		Body:       string(buf),
+		Headers:    hdr,
 		StatusCode: http.StatusOK,
 	}
 }
@@ -99,15 +92,15 @@ func newArray(descr string, status int) []map[string]string {
 	id := formatTimestamp()
 
 	// item is actually a map
-	item := map[string]string {
+	item := map[string]string{
 		"detail": descr,
 		"status": str,
-		"code": "DEMO-"+str,
-		"id": id,
+		"code":   "DEMO-" + str,
+		"id":     id,
 	}
 
 	// array of objects that compose the top-level "errors" field
-	return []map[string]string {item}
+	return []map[string]string{item}
 }
 
 func formatTimestamp() string {
@@ -120,10 +113,9 @@ func formatTimestamp() string {
 
 // TODO review before open access
 func enableCors() map[string]string {
-        return map[string]string {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
-                "Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
-        }
+	return map[string]string{
+		"Access-Control-Allow-Origin":  "*",
+		"Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
+		"Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
+	}
 }
-

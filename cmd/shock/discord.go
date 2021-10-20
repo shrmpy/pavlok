@@ -21,10 +21,10 @@ func webhook(status string) string {
 		return ""
 	}
 
-	m := map[string]string {
-		"username": "Webhook-twitch-ext-demo",
+	m := map[string]string{
+		"username":   "Webhook-twitch-ext-demo",
 		"avatar_url": av,
-		"content": status,
+		"content":    status,
 	}
 
 	buf, err := json.Marshal(m)
@@ -52,4 +52,3 @@ func webhook(status string) string {
 
 	return string(data)
 }
-

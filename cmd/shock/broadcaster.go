@@ -32,17 +32,16 @@ func broadcaster(ev events.APIGatewayProxyRequest) string {
 		return ""
 	}
 
-        if claims.ChannelID == "" {
-                log.Print("Missing channel ID in claims")
-		return ""
-        }
-
-	//todo enforce role for now during initial testing (until cheers wired-up)
-	if claims.Role != "broadcaster" {
-                log.Print("Role must be broadcaster during testing period")
+	if claims.ChannelID == "" {
+		log.Print("Missing channel ID in claims")
 		return ""
 	}
 
-        return claims.ChannelID
-}
+	//todo enforce role for now during initial testing (until cheers wired-up)
+	if claims.Role != "broadcaster" {
+		log.Print("Role must be broadcaster during testing period")
+		return ""
+	}
 
+	return claims.ChannelID
+}

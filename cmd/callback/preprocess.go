@@ -1,12 +1,12 @@
 /*
 
-*/
+ */
 package main
 
 import (
 	//"errors"
-	"log"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/awslabs/aws-lambda-go-api-proxy/core"
 )
+
 /*
 func preprocess(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
         if ev.HTTPMethod == "OPTIONS" {
@@ -44,22 +45,21 @@ func preprocess(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 
 // make state value that functions like a file hash
 func generateState(ev events.APIGatewayProxyRequest) string {
-        accessor := core.RequestAccessor{}
-        req, err := accessor.EventToRequest(ev)
-        if err != nil {
+	accessor := core.RequestAccessor{}
+	req, err := accessor.EventToRequest(ev)
+	if err != nil {
 		log.Print("Convert event failed, state not created")
-                return ""
-        }
+		return ""
+	}
 
 	token, err := helper.token(req)
 	if err != nil {
 		log.Print("JWT extract failed ")
-                return ""
+		return ""
 	}
 	// wrap token for use as state value
 	return encryptState(token)
 }
-
 
 // include CORS in response header
 func newResponse(descr string, status int) events.APIGatewayProxyResponse {
@@ -68,8 +68,8 @@ func newResponse(descr string, status int) events.APIGatewayProxyResponse {
 	hdr["Content-Type"] = "application/json"
 
 	return events.APIGatewayProxyResponse{
-		Body: string(buf),
-		Headers: hdr,
+		Body:       string(buf),
+		Headers:    hdr,
 		StatusCode: http.StatusOK,
 	}
 }
@@ -95,15 +95,15 @@ func newArray(descr string, status int) []map[string]string {
 	id := formatTimestamp()
 
 	// item is actually a map
-	item := map[string]string {
+	item := map[string]string{
 		"detail": descr,
 		"status": str,
-		"code": "DEMO-"+str,
-		"id": id,
+		"code":   "DEMO-" + str,
+		"id":     id,
 	}
 
 	// array of objects that compose the top-level "errors" field
-	return []map[string]string {item}
+	return []map[string]string{item}
 }
 
 func formatTimestamp() string {
@@ -116,10 +116,9 @@ func formatTimestamp() string {
 
 // TODO review before open access
 func enableCors() map[string]string {
-        return map[string]string {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
-                "Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
-        }
+	return map[string]string{
+		"Access-Control-Allow-Origin":  "*",
+		"Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
+		"Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
+	}
 }
-

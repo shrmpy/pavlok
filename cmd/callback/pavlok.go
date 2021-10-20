@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	"os"
 	"net/http"
+	"os"
 	"regexp"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -44,11 +44,11 @@ func tradeToken(ev events.APIGatewayProxyRequest) string {
 	base := "https://app.pavlok.com/oauth/token"
 
 	m := map[string]string{
-		"client_id": cid,
+		"client_id":     cid,
 		"client_secret": sec,
-		"redirect_uri": redir,
-		"grant_type": "authorization_code",
-		"code": code,
+		"redirect_uri":  redir,
+		"grant_type":    "authorization_code",
+		"code":          code,
 	}
 
 	buf, err := json.Marshal(m)
@@ -95,5 +95,3 @@ func debugDeidentify(b []byte) string {
 
 	return string(result)
 }
-
-
