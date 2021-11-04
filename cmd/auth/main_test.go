@@ -48,7 +48,6 @@ func TestPreflight(t *testing.T) {
 }
 
 func TestMissingAuthorization(t *testing.T) {
-
 	// prep test data
 	req := events.APIGatewayProxyRequest{
 		HTTPMethod: "GET",
@@ -62,6 +61,28 @@ func TestMissingAuthorization(t *testing.T) {
 
 	// case specific expectation
 	missing := newResponse("Missing authorization header", http.StatusUnauthorized)
+	expected := ignoreTimestamp(missing.Body)
+	actual := ignoreTimestamp(result.Body)
+	// inspect content
+	assert.Equal(t, expected, actual)
+}
+
+func TestWrongExtensionSecret(t *testing.T) {
+	// prepare data
+	wrongHeader := make(map[string]string)
+	wrongHeader["Authorization"] = "Bearer WRONG-KEY"
+	req := events.APIGatewayProxyRequest{
+		HTTPMethod: "GET",
+		Body:       "",
+		Headers:    wrongHeader,
+	}
+	// run handler logic
+	result, err := handler(req)
+	assert.IsType(t, nil, err)
+	assert.Equal(t, http.StatusOK, result.StatusCode)
+
+	// case specific expectation
+	missing := newResponse("Wrong authorization header", http.StatusUnauthorized)
 	expected := ignoreTimestamp(missing.Body)
 	actual := ignoreTimestamp(result.Body)
 	// inspect content

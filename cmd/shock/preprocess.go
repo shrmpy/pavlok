@@ -34,6 +34,16 @@ func preprocess(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 		return newResponse(token, http.StatusUnauthorized), errors.New("jwt extract")
 	}
 
+        // extension secret is enforced by claims extraction
+        cl, err := helper.claims(token)
+        if err != nil {
+                log.Print("Malformed claims meta data")
+                return newResponse("Wrong authorization header", http.StatusUnauthorized),
+errors.New("claims")
+        }
+        //TODO do we need to verify channel ID and role (see state.go)
+        log.Printf("Claims (ch/role): %s / %s", cl.ChannelID, cl.Role)
+
 	return events.APIGatewayProxyResponse{}, nil
 }
 
