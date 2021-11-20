@@ -16,10 +16,6 @@ import (
 )
 
 func preprocess(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if ev.HTTPMethod == "OPTIONS" {
-		// answer preflight checks
-		return newResponse("", http.StatusOK), errors.New("preflight step")
-	}
 
 	accessor := core.RequestAccessor{}
 	req, err := accessor.EventToRequest(ev)
@@ -70,12 +66,9 @@ func generateState(ev events.APIGatewayProxyRequest) string {
 // include CORS in response header
 func newResponse(descr string, status int) events.APIGatewayProxyResponse {
 	buf := encodeError(descr, status)
-	hdr := enableCors()
-	hdr["Content-Type"] = "application/json"
 
 	return events.APIGatewayProxyResponse{
 		Body:       string(buf),
-		Headers:    hdr,
 		StatusCode: http.StatusOK,
 	}
 }
@@ -118,13 +111,4 @@ func formatTimestamp() string {
 
 	n := time.Now().UnixNano()
 	return strconv.FormatInt(n, 10)
-}
-
-// TODO review before open access
-func enableCors() map[string]string {
-	return map[string]string{
-		"Access-Control-Allow-Origin":  "*",
-		"Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
-		"Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
-	}
 }

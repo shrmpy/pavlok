@@ -28,3 +28,4 @@ CORS by [Flavio Copes](https://flaviocopes.com/golang-enable-cors/)
 
 En/decrypt by [Nic Raboy](https://www.thepolyglotdeveloper.com/2018/02/encrypt-decrypt-data-golang-application-crypto-packages/)
 
+Middleware by [Zach Johnson](https://www.zachjohnsondev.com/posts/lambda-go-middleware/)

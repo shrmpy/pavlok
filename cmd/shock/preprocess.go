@@ -16,10 +16,6 @@ import (
 )
 
 func preprocess(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if ev.HTTPMethod == "OPTIONS" {
-		// answer preflight checks
-		return newResponse("", http.StatusOK), errors.New("preflight step")
-	}
 
 	accessor := core.RequestAccessor{}
 	req, err := accessor.EventToRequest(ev)
@@ -34,15 +30,15 @@ func preprocess(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 		return newResponse(token, http.StatusUnauthorized), errors.New("jwt extract")
 	}
 
-        // extension secret is enforced by claims extraction
-        cl, err := helper.claims(token)
-        if err != nil {
-                log.Print("Malformed claims meta data")
-                return newResponse("Wrong authorization header", http.StatusUnauthorized),
-errors.New("claims")
-        }
-        //TODO do we need to verify channel ID and role (see state.go)
-        log.Printf("Claims (ch/role): %s / %s", cl.ChannelID, cl.Role)
+	// extension secret is enforced by claims extraction
+	cl, err := helper.claims(token)
+	if err != nil {
+		log.Print("Malformed claims meta data")
+		return newResponse("Wrong authorization header", http.StatusUnauthorized),
+			errors.New("claims")
+	}
+	//TODO do we need to verify channel ID and role (see state.go)
+	log.Printf("Claims (ch/role): %s / %s", cl.ChannelID, cl.Role)
 
 	return events.APIGatewayProxyResponse{}, nil
 }
@@ -68,12 +64,10 @@ func generateState(ev events.APIGatewayProxyRequest) string {
 // include CORS in response header
 func newResponse(descr string, status int) events.APIGatewayProxyResponse {
 	buf := encodeError(descr, status)
-	hdr := enableCors()
-	hdr["Content-Type"] = "application/json"
 
 	return events.APIGatewayProxyResponse{
-		Body:       string(buf),
-		Headers:    hdr,
+		Body: string(buf),
+
 		StatusCode: http.StatusOK,
 	}
 }
@@ -116,13 +110,4 @@ func formatTimestamp() string {
 
 	n := time.Now().UnixNano()
 	return strconv.FormatInt(n, 10)
-}
-
-// TODO review before open access
-func enableCors() map[string]string {
-	return map[string]string{
-		"Access-Control-Allow-Origin":  "*",
-		"Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
-		"Access-Control-Allow-Headers": "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization",
-	}
 }

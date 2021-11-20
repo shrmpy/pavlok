@@ -1,15 +1,13 @@
 package main
 
 import (
-
-	//"errors"
 	"log"
 	"net/http"
 	"regexp"
 	"testing"
 
-	//"github.com/aws/aws-lambda-go/lambda/handlertrace"
 	"github.com/aws/aws-lambda-go/events"
+	ebs "github.com/shrmpy/pavlok"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,26 +31,27 @@ func TestHandlers(t *testing.T) {
 }
 
 func TestPreflight(t *testing.T) {
-	vanilla := newResponse("", http.StatusOK)
 	// prep test data
-	req := events.APIGatewayProxyRequest{
-		HTTPMethod: "OPTIONS",
-		Body:       "",
-	}
-	// run the logic
-	result, err := handler(req)
-	// verify results
+	conf := ebs.NewConfig()
+	expectMethods := "POST, GET, OPTIONS, PUT"
+	expectHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+	expectOrigin := ""
+	req := newTestRequest("OPTIONS")
+
+	// run the handler logic
+	result, err := ebs.MiddlewareCORS(conf, handler)(req)
 	assert.IsType(t, nil, err)
 	assert.Equal(t, http.StatusOK, result.StatusCode)
-	assert.Equal(t, vanilla.Headers, result.Headers)
+	// check for expected CORS
+	assert.Equal(t, expectMethods, result.Headers["Access-Control-Allow-Methods"])
+	assert.Equal(t, expectHeaders, result.Headers["Access-Control-Allow-Headers"])
+	assert.Equal(t, expectOrigin, result.Headers["Access-Control-Allow-Origin"])
 }
 
 func TestMissingAuthorization(t *testing.T) {
 	// prep test data
-	req := events.APIGatewayProxyRequest{
-		HTTPMethod: "GET",
-		Body:       "",
-	}
+	req := newTestRequest("GET")
+
 	// run the logic
 	result, err := handler(req)
 	// verify results
@@ -69,13 +68,9 @@ func TestMissingAuthorization(t *testing.T) {
 
 func TestWrongExtensionSecret(t *testing.T) {
 	// prepare data
-	wrongHeader := make(map[string]string)
-	wrongHeader["Authorization"] = "Bearer WRONG-KEY"
-	req := events.APIGatewayProxyRequest{
-		HTTPMethod: "GET",
-		Body:       "",
-		Headers:    wrongHeader,
-	}
+	req := newTestRequest("GET")
+	req.Headers["Authorization"] = "Bearer WRONG-KEY"
+
 	// run handler logic
 	result, err := handler(req)
 	assert.IsType(t, nil, err)
@@ -87,6 +82,38 @@ func TestWrongExtensionSecret(t *testing.T) {
 	actual := ignoreTimestamp(result.Body)
 	// inspect content
 	assert.Equal(t, expected, actual)
+}
+
+func TestAccessControlAllowOrigin(t *testing.T) {
+	// prepare data
+	conf := ebs.NewConfig()
+	conf.ExtensionId("HOSTNAME-TEST")
+	expectMethods := "POST, GET, OPTIONS, PUT"
+	expectHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+	expectOrigin := "https://HOSTNAME-TEST.ext-twitch.tv"
+	req := newTestRequest("GET")
+
+	// run handler logic
+	result, err := ebs.MiddlewareCORS(conf, handler)(req)
+	assert.IsType(t, nil, err)
+	assert.Equal(t, http.StatusOK, result.StatusCode)
+
+	// check for expected CORS
+	assert.Equal(t, expectMethods, result.Headers["Access-Control-Allow-Methods"])
+	assert.Equal(t, expectHeaders, result.Headers["Access-Control-Allow-Headers"])
+	assert.Equal(t, expectOrigin, result.Headers["Access-Control-Allow-Origin"])
+}
+
+func newTestRequest(meth string) events.APIGatewayProxyRequest {
+	// generic CORS request
+	h := make(map[string]string)
+	h["Content-Type"] = "application/json"
+
+	return events.APIGatewayProxyRequest{
+		HTTPMethod: meth,
+		Body:       "",
+		Headers:    h,
+	}
 }
 
 func ignoreTimestamp(body string) string {
