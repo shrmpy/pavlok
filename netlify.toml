@@ -4,6 +4,7 @@
   AMBER_PHRASE = "secret phrase used to encrypt OAuth state field"
   DISCORD_WEBHOOK = ""
   EXTENSION_SECRET = "secret from the Twitch Extension Manager"
+  EXTENSION_ID = "client ID from the Twitch Extension Manager"
   FAUNADB_SECRET = "secret from Fauna DB account"
   GITHUB_AVATAR = ""
   PAVLOK_CLIENT_ID = "Pavlok app client ID"
@@ -17,7 +18,6 @@
   publish = "public"
 
 [build.environment]
-  GO_IMPORT_PATH = "github.com/shrmpy/pavlok"
   GO111MODULE = "on"
 
 [[redirects]]

@@ -7,17 +7,24 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	ebs "github.com/shrmpy/pavlok"
 )
 
 var helper *service
+var conf *ebs.Config
 
 func init() {
+	conf = ebs.NewConfig()
 	secret := os.Getenv("EXTENSION_SECRET")
 	helper = newService(decodeSecret(secret))
 }
 
 func main() {
-	lambda.Start(handler)
+	lambda.Start(
+		ebs.MiddlewareCORS(conf,
+			handler,
+		),
+	)
 }
 
 // *auth* flow part 1
@@ -35,13 +42,10 @@ func handler(ev events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 
 	state := generateState(ev)
 
-	hdr := enableCors()
-	hdr["Content-Type"] = "application/json"
 	buf, _ := json.Marshal(redirectHeaders(state))
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Headers:    hdr,
 		Body:       string(buf),
 	}, nil
 }
